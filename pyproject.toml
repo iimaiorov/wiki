@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "wiki"
+version = "0.1.0"
+description = ""
+authors = ["yurapwnz <yurapwnz1992@ya.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+selene = "2.0.0rc9"
+appium-python-client = "^4.4.0"
+pytest = "^8.3.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
