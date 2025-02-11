@@ -10,6 +10,11 @@ python = "^3.12"
 selene = "2.0.0rc9"
 appium-python-client = "^4.4.0"
 pytest = "^8.3.4"
+allure-python-commons = "^2.13.5"
+allure-pytest = "^2.13.5"
+requests = "^2.32.3"
+python-dotenv = "^1.0.1"
+pydantic-settings = "^2.7.1"
 
 [build-system]
 requires = ["poetry-core"]

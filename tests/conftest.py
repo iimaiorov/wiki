@@ -1,45 +1,50 @@
 import pytest
-from appium.options.android import UiAutomator2Options
-from selene import browser
-import os
+import allure_commons
 from appium import webdriver
+from dotenv import load_dotenv
+from selene import browser, support
+
+import project
+from utils import allure
+
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--context",
+        default="bstack",
+        help="Specify the test context"
+    )
+
+
+def pytest_configure(config):
+    context = config.getoption("--context")
+    env_file_path = f".env.{context}"
+
+    load_dotenv(dotenv_path=env_file_path)
+
+
+@pytest.fixture
+def context(request):
+    return request.config.getoption("--context")
 
 
 @pytest.fixture(scope='function', autouse=True)
-def mobile_management():
-    options = UiAutomator2Options().load_capabilities({  # опции для запуска теста на android, именно локальные опции
-        # Specify device and os_version for testing
-        "platformName": "android",
-        # Название платформы, это не обязательно указывать, так как по умолчанию стоит android
-        "platformVersion": "9.0",  # Версия Android
-        "deviceName": "Google Pixel 3",  # Имя устройства в Browserstack
+def mobile_management(context):
+    options = project.to_driver_options(context=context)
 
-        # Set URL of the application under test
-        "app": "bs://sample.app",
-        # Ссылка на загруженное приложение в Browserstack. Если стандартное приложение, то оставить как есть
-
-        # Set other BrowserStack capabilities (опции именно для Browserstack)
-        'bstack:options': {
-            "projectName": "First Python project",  # Название проекта которое будет отображаться в Browserstack
-            "buildName": "browserstack-build-1",  # Название сборки которое будет отображаться в Browserstack
-            "sessionName": "BStack first_test",  # Название сессии которое будет отображаться в Browserstack
-
-            # Set your access credentials
-            "userName": "yuramayorov_r0RgK5",  # Ваш логин в Browserstack
-            "accessKey": "TpJicZDk8Y2oTAYSw3uQ"  # Ваш ключ доступа в Browserstack
-        }
-    })
-
-    browser.config.driver = webdriver.Remote("http://hub.browserstack.com/wd/hub",
-                                             options=options)  # Адрес для подключения к Browserstack
-
-    browser.config.timeout = float(os.getenv('timeout', '10.0'))  # Таймаут для ожидания элементов
-
-    # тут можно добавить низкоуровневое логирование шагов
-
-    session_id = browser.driver.session_id  # Получаем ID сессии
+    browser.config.driver = webdriver.Remote(options.get_capability('remote_url'), options=options)
+    browser.config.timeout = 10.0
+    browser.config._wait_decorator = support._logging.wait_with(
+        context = allure_commons._allure.StepContext
+    )
 
     yield
 
-    # аттачи
+    allure.attach_screenshot()
+    allure.attach_page_source()
+    session_id = browser.driver.session_id
+
     browser.quit()
+
+    if context == 'bstack':
+        allure.attach_bstack_video(session_id)
