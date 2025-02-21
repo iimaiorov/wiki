@@ -1,31 +1,20 @@
-import pytest
-from appium.webdriver.common.appiumby import AppiumBy
-from selene import browser, have
-from allure import step
+import allure
+from wiki.pages.main_page import main_page
+from wiki.pages.onboarding_screen_page import onboarding_screen_page
 
 
-def test_search():
-    with step('Skip welcome screen'):
-        browser.element((AppiumBy.ID, 'org.wikipedia.alpha:id/fragment_onboarding_skip_button')).click()
 
-    with step('Type search request'):
-        browser.element((AppiumBy.ACCESSIBILITY_ID, 'Поиск по Википедии')).click()
-        browser.element((AppiumBy.ID, 'org.wikipedia.alpha:id/search_src_text')).type('Python')
+@allure.epic('Главная страница')
+@allure.story('Поиск статей')
+class TestSearch:
+    def test_search(self):
+        title = 'Python'
 
-    with step('Check search results'):
-        result = browser.all((AppiumBy.ID, 'org.wikipedia.alpha:id/page_list_item_title'))
-        result.should(have.size_greater_than(0))
-        result.first.should(have.text('Python'))
+        onboarding_screen_page.skip_onboarding()
 
-def test_reading_list_tab():
-    with step('Skip welcome screen'):
-        browser.element((AppiumBy.ID, 'org.wikipedia.alpha:id/fragment_onboarding_skip_button')).click()
+        main_page.should_have_main_page()
+        main_page.search(title)
 
-    with step('Open saved articles'):
-        browser.element((AppiumBy.ACCESSIBILITY_ID, 'Сохранённые')).click()
+        main_page.should_have_search_results(title)
 
-    with step ('Close sychronization notification'):
-        browser.element((AppiumBy.ID, 'org.wikipedia.alpha:id/negativeButton')).click()
 
-    with step('Check saved articles'):
-        browser.element((AppiumBy.ID, 'org.wikipedia.alpha:id/empty_title')).should(have.text('Ещё нет списков для чтения'))
