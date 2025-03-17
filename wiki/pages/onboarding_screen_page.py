@@ -1,6 +1,7 @@
 import allure
 from appium.webdriver.common.appiumby import AppiumBy
-from selene import browser,have
+from selene import browser, have
+
 
 class OnboardingScreenPage:
     def __init__(self):
@@ -26,16 +27,16 @@ class OnboardingScreenPage:
             browser.element(self.primary_text).should(have.text('The Free Encyclopedia'))
 
     def should_have_new_way_window(self):
-        with allure.step('Проверка наличия текста на экране "New way"'):
+        with allure.step('Check the text on the "New ways to explore" screen'):
             browser.element(self.primary_text).should(have.text('New ways to explore'))
 
     def should_have_reading_lists_window(self):
-        with allure.step('Проверка наличия текста на экране "Reading lists"'):
+        with allure.step('Check the text on the "Reading lists with sync" screen'):
             browser.element(self.primary_text).should(have.text('Reading lists with sync'))
 
-
     def should_have_data_and_privacy_window(self):
-        with allure.step('Проверка наличия текста на экране "Data and Privacy"'):
+        with allure.step('Check the text on the "Data & Privacy" screen'):
             browser.element(self.primary_text).should(have.text('Data & Privacy'))
+
 
 onboarding_screen_page = OnboardingScreenPage()
